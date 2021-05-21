@@ -9,10 +9,10 @@ using namespace std;
 // P00 P01
 // P10 P11
 double probability[2][2];
-bool state = false;
-float error_burst = 0;
-float avg_error_burst = 0;
-int error_times = 0;
+bool state = false;         // state now
+float error_burst = 0;      // temporary save the number of continuous packet lost each time
+float avg_error_burst = 0;  // the average length of error burst
+int error_times = 0;        // the total times of the continuous packet lost
 
 int main(){
 
@@ -25,11 +25,12 @@ int main(){
     double P1 = probability[0][1] / (probability[0][1] + probability[1][0]);
 
     srand( time(NULL) % 100 * time(NULL));
-    double x = (double) rand() / (RAND_MAX + 1.0); 
+    double x = (double) rand() / (RAND_MAX + 1.0); // get random number between [0,1]
+
     if(x > P0) state = true;    // start from the Good state
     else state = false;         // start from the Bad state
 
-    for (int i = 0; i < 1000; i++){
+    for (int i = 0; i < 1000; i++){     // set the total number of packets to be 1000
         if (state){
             // Good now
             srand(rand());
@@ -50,11 +51,12 @@ int main(){
                 // Bad -> Good
                 state = true;
                 if (i == 0) continue;   // if start from the Bad state
+                // calculate the average length of error burst now
                 avg_error_burst = (avg_error_burst * (float)error_times + (float)error_burst) / (float)(error_times + 1);
+                // the total times of the continuous packet lost
                 error_times++;
                 // cout << "error_burst[" << error_times <<"]: " << error_burst << endl;
                 error_burst = 0;
-                
             }
             else {
                 // Bad -> Bad
